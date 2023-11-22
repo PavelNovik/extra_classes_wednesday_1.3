@@ -2,7 +2,7 @@ import React, {FC, useState} from "react";
 import {Box, CircularProgress, Typography} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {AppRootStateType} from "./state/store";
-import {changeProgressAC} from "./state/circularStatic-reducer";
+import {changeIsWaitingDoneAC, changeProgressAC} from "./state/circularStatic-reducer";
 
 interface ICircularProgressWithLabel {
     value: number
@@ -35,48 +35,58 @@ interface ICircularStatic {
     isWaiting: boolean
     //interval milliseconds
     timeInterval: number
-    id:string
+    id: string
 }
 
 //TASK
 //Use redux instead local state
 
 export const CircularStatic: FC<ICircularStatic> = (props) => {
-    const [progress, setProgress] = useState(0);
+    // const [progress, setProgress] = useState(0);
     const id = props.id
-    console.log(id)
     const progres = useSelector<AppRootStateType, number>(state => state.circularStatic[id] ? state.circularStatic[id].progress : 0)
-
-    const [isWaitingDone, setIsWaitingDone] = useState(true);
-
+    // const [isWaitingDone, setIsWaitingDone] = useState(true);
     const isWaitingDon = useSelector<AppRootStateType, boolean>(state => state.circularStatic[id] ? state.circularStatic[id].isWaitingDone : true)
 
     const dispatch = useDispatch()
-
+    const changeProgres = (value: number) => {
+        dispatch(changeProgressAC(id, value))
+    }
     React.useEffect(() => {
         let timer: ReturnType<typeof setInterval>
-        if (props.isWaiting && isWaitingDone) {
+        if (props.isWaiting && isWaitingDon) {
             timer = setInterval(() => {
-                dispatch(changeProgressAC(id,progres+10))
-                setProgress((prevProgress) => {
-                    if (prevProgress === 100) {
+                const newProg = () => {
+                    console.log(progres)
+                    if (progres === 100) {
                         clearInterval(timer)
-                        setIsWaitingDone(false)
+                        // setIsWaitingDone(false)
+                        dispatch(changeIsWaitingDoneAC(id, false))
                     }
-                    return prevProgress >= 100 ? 0 : prevProgress + 10
-                });
+                    console.log(progres)
+                    return progres >= 100 ? 0 : progres + 10
+                }
+                changeProgres(newProg())
+                // setProgress((prevProgress) => {
+                //     if (prevProgress === 100) {
+                //         clearInterval(timer)
+                //         setIsWaitingDone(false)
+                //     }
+                //     return prevProgress >= 100 ? 0 : prevProgress + 10
+                // });
             }, props.timeInterval);
         } else {
-            setProgress(0)
+            // setProgress(0)
+            changeProgres(0)
         }
-
         return () => {
-            dispatch(changeProgressAC(id,0))
+            if (progres >= 90) changeProgres(0)
+            // dispatch(changeProgressAC(id,0))
             clearInterval(timer);
         };
-    }, [props.isWaiting]);
+    }, [props.isWaiting, dispatch]);
 
-    return <CircularProgressWithLabel value={progress}/>;
+    return <CircularProgressWithLabel value={progres}/>;
 }
 
 
