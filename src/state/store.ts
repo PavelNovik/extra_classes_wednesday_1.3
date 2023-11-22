@@ -2,13 +2,15 @@ import { isLoadingReducer } from './isLoading-reducer';
 import { tasksReducer } from './tasks-reducer';
 import { todolistsReducer } from './todolists-reducer';
 import { combineReducers, createStore, legacy_createStore } from 'redux';
+import {circularStaticReducer} from "./circularStatic-reducer";
 
 // объединяя reducer-ы с помощью combineReducers,
 // мы задаём структуру нашего единственного объекта-состояния
 const rootReducer = combineReducers({
     tasks: tasksReducer,
     todolists: todolistsReducer,
-    isLoading: isLoadingReducer
+    isLoading: isLoadingReducer,
+    circularStatic: circularStaticReducer
 })
 // непосредственно создаём store
 export const store = legacy_createStore(rootReducer);

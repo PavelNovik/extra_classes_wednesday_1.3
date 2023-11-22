@@ -1,11 +1,14 @@
 import React, {FC, useState} from "react";
 import {Box, CircularProgress, Typography} from "@mui/material";
+import {useDispatch, useSelector} from "react-redux";
+import {AppRootStateType} from "./state/store";
+import {changeProgressAC} from "./state/circularStatic-reducer";
 
 interface ICircularProgressWithLabel {
     value: number
 }
 
-const  CircularProgressWithLabel: React.FC<ICircularProgressWithLabel> = (props) => {
+const CircularProgressWithLabel: React.FC<ICircularProgressWithLabel> = (props) => {
 
     return (
         <Box position="relative" display="inline-flex">
@@ -28,23 +31,33 @@ const  CircularProgressWithLabel: React.FC<ICircularProgressWithLabel> = (props)
     );
 }
 
-interface ICircularStatic{
+interface ICircularStatic {
     isWaiting: boolean
     //interval milliseconds
     timeInterval: number
+    id:string
 }
 
 //TASK
 //Use redux instead local state
 
-export const  CircularStatic: FC<ICircularStatic> = (props) => {
+export const CircularStatic: FC<ICircularStatic> = (props) => {
     const [progress, setProgress] = useState(0);
+    const id = props.id
+    console.log(id)
+    const progres = useSelector<AppRootStateType, number>(state => state.circularStatic[id] ? state.circularStatic[id].progress : 0)
+
     const [isWaitingDone, setIsWaitingDone] = useState(true);
+
+    const isWaitingDon = useSelector<AppRootStateType, boolean>(state => state.circularStatic[id] ? state.circularStatic[id].isWaitingDone : true)
+
+    const dispatch = useDispatch()
 
     React.useEffect(() => {
         let timer: ReturnType<typeof setInterval>
         if (props.isWaiting && isWaitingDone) {
             timer = setInterval(() => {
+                dispatch(changeProgressAC(id,progres+10))
                 setProgress((prevProgress) => {
                     if (prevProgress === 100) {
                         clearInterval(timer)
@@ -58,6 +71,7 @@ export const  CircularStatic: FC<ICircularStatic> = (props) => {
         }
 
         return () => {
+            dispatch(changeProgressAC(id,0))
             clearInterval(timer);
         };
     }, [props.isWaiting]);

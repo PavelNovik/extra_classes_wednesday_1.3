@@ -24,8 +24,8 @@ type PropsType = {
 }
 
 export function TodolistWithRedux({ todolist }: PropsType) {
-    // const [isLoading, setIsLoading] = useState<boolean>(false)
-    const { isLoading } = useSelector<AppRootStateType, IsLoadingStateType>(store => store.isLoading)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
+    // const { isLoading } = useSelector<AppRootStateType, IsLoadingStateType>(store => store.isLoading)
 
     const { id, title, filter } = todolist
 
@@ -35,11 +35,11 @@ export function TodolistWithRedux({ todolist }: PropsType) {
 
 
     const dispatchWithLoading = (action: TasksActionsType) => {
-        // setIsLoading(true)
-        dispatch(isLoadingAC(true))
+        setIsLoading(true)
+        // dispatch(isLoadingAC(true))
         dispatch(action)
-        // setTimeout(() => setIsLoading(false), 20000)
-        setTimeout(() => dispatch(isLoadingAC(false)), 20000)
+        setTimeout(() => setIsLoading(false), 20000)
+        // setTimeout(() => dispatch(isLoadingAC(false)), 20000)
     }
 
 
@@ -69,7 +69,7 @@ export function TodolistWithRedux({ todolist }: PropsType) {
     return <div>
         {isLoading && <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>LOADING</span>
-            <CircularStatic isWaiting={isLoading} timeInterval={2000} />
+            <CircularStatic id={id} isWaiting={isLoading} timeInterval={2000} />
         </div>}
         {!isLoading && <div>
             <h3><EditableSpan value={title} onChange={changeTodolistTitle} />
