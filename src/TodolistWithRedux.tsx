@@ -1,16 +1,16 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
-import { AddItemForm } from './AddItemForm';
-import { EditableSpan } from './EditableSpan';
+import React, {ChangeEvent, useEffect, useState} from 'react';
+import {AddItemForm} from './AddItemForm';
+import {EditableSpan} from './EditableSpan';
 import IconButton from "@mui/material/IconButton/IconButton";
-import { Delete } from "@mui/icons-material";
-import { Button, Checkbox } from "@mui/material";
-import { TodolistType } from "./AppWithRedux";
-import { useDispatch, useSelector } from "react-redux";
-import { AppRootStateType } from "./state/store";
-import { addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC, TasksActionsType } from "./state/tasks-reducer";
-import { changeTodolistFilterAC, changeTodolistTitleAC, removeTodolistAC } from "./state/todolists-reducer";
-import { CircularStatic } from "./Circular progress-withL-label";
-import { IsLoadingStateType, isLoadingAC } from './state/isLoading-reducer';
+import {Delete} from "@mui/icons-material";
+import {Button, Checkbox} from "@mui/material";
+import {TodolistType} from "./AppWithRedux";
+import {useDispatch, useSelector} from "react-redux";
+import {AppRootStateType} from "./state/store";
+import {addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC, TasksActionsType} from "./state/tasks-reducer";
+import {changeTodolistFilterAC, changeTodolistTitleAC, removeTodolistAC} from "./state/todolists-reducer";
+import {CircularStatic} from "./Circular progress-withL-label";
+import {isLoadingAC, IsLoadingType} from './state/isLoading-reducer';
 
 
 export type TaskType = {
@@ -23,11 +23,11 @@ type PropsType = {
     todolist: TodolistType
 }
 
-export function TodolistWithRedux({ todolist }: PropsType) {
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    // const { isLoading } = useSelector<AppRootStateType, IsLoadingStateType>(store => store.isLoading)
+export function TodolistWithRedux({todolist}: PropsType) {
+    // const [isLoading, setIsLoading] = useState<boolean>(false)
+    const {id, title, filter} = todolist
 
-    const { id, title, filter } = todolist
+    const {isLoading} = useSelector<AppRootStateType, IsLoadingType>(store => store.isLoading[id])
 
     let tasks = useSelector<AppRootStateType, Array<TaskType>>(state => state.tasks[id])
 
@@ -35,11 +35,11 @@ export function TodolistWithRedux({ todolist }: PropsType) {
 
 
     const dispatchWithLoading = (action: TasksActionsType) => {
-        setIsLoading(true)
-        // dispatch(isLoadingAC(true))
+        // setIsLoading(true)
+        dispatch(isLoadingAC(id, true))
         dispatch(action)
-        setTimeout(() => setIsLoading(false), 20000)
-        // setTimeout(() => dispatch(isLoadingAC(false)), 20000)
+        // setTimeout(() => setIsLoading(false), 20000)
+        setTimeout(() => dispatch(isLoadingAC(id, false)), 20000)
     }
 
 
@@ -67,17 +67,17 @@ export function TodolistWithRedux({ todolist }: PropsType) {
     }
 
     return <div>
-        {isLoading && <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {isLoading && <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
             <span>LOADING</span>
-            <CircularStatic id={id} isWaiting={isLoading} timeInterval={2000} />
+            <CircularStatic id={id} isWaiting={isLoading} timeInterval={2000}/>
         </div>}
         {!isLoading && <div>
-            <h3><EditableSpan value={title} onChange={changeTodolistTitle} />
+            <h3><EditableSpan value={title} onChange={changeTodolistTitle}/>
                 <IconButton onClick={removeTodolist}>
-                    <Delete />
+                    <Delete/>
                 </IconButton>
             </h3>
-            <AddItemForm addItem={addTask} />
+            <AddItemForm addItem={addTask}/>
             <div>
                 {
                     tasks.map(t => {
@@ -98,9 +98,9 @@ export function TodolistWithRedux({ todolist }: PropsType) {
                                 onChange={onChangeHandler}
                             />
 
-                            <EditableSpan value={t.title} onChange={onTitleChangeHandler} />
+                            <EditableSpan value={t.title} onChange={onTitleChangeHandler}/>
                             <IconButton onClick={onClickHandler}>
-                                <Delete />
+                                <Delete/>
                             </IconButton>
                         </div>
                     })
@@ -108,17 +108,17 @@ export function TodolistWithRedux({ todolist }: PropsType) {
             </div>
             <div>
                 <Button variant={filter === 'all' ? 'outlined' : 'text'}
-                    onClick={onAllClickHandler}
-                    color={'inherit'}
+                        onClick={onAllClickHandler}
+                        color={'inherit'}
                 >All
                 </Button>
                 <Button variant={filter === 'active' ? 'outlined' : 'text'}
-                    onClick={onActiveClickHandler}
-                    color={'primary'}>Active
+                        onClick={onActiveClickHandler}
+                        color={'primary'}>Active
                 </Button>
                 <Button variant={filter === 'completed' ? 'outlined' : 'text'}
-                    onClick={onCompletedClickHandler}
-                    color={'secondary'}>Completed
+                        onClick={onCompletedClickHandler}
+                        color={'secondary'}>Completed
                 </Button>
             </div>
         </div>}
