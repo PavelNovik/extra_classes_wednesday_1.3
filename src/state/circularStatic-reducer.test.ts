@@ -15,11 +15,15 @@ beforeEach(() => {
 test('CircularStatic object should be created', () => {
     const action = addTodolistAC('test')
     const endState = circularStaticReducer(startState, action)
+    const action1 = addTodolistAC('test1')
+    const endState1 = circularStaticReducer(endState, action1)
 
     expect(endState[action.todolistId].progress).toBe(0)
+    expect(endState1[action1.todolistId].progress).toBe(0)
     expect(endState[action.todolistId].isWaitingDone).toBeTruthy()
-    expect(Object.keys(endState).length).toBe(1)
+    expect(Object.keys(endState1).length).toBe(2)
     expect(Object.keys(endState)[0]).toBe(action.todolistId)
+    expect(Object.keys(endState1)[1]).toBe(action1.todolistId)
     expect(Object.keys(endState[action.todolistId]).length).toBe(2)
     expect(Object.keys(endState[action.todolistId])[0]).toBe('progress')
     expect(Object.keys(endState[action.todolistId])[1]).toBe('isWaitingDone')
